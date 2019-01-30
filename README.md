@@ -1,4 +1,4 @@
 # advanced_quant
 I'll be posting notes and code for each of the labs. 
 
-- Lab 01 [link](lab01.md)
+- Lab 01 [link](lab_01/README.md)
