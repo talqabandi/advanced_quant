@@ -5,11 +5,11 @@ Download R and RStudio
 
 <https://cran.cnr.berkeley.edu/>
 
-1.  Then download R Studio:
+2.  Then download R Studio:
 
 <https://www.rstudio.com/products/rstudio/download/>
 
-1.  Set your working directory:
+3.  Set your working directory:
 
 <!-- -->
 
@@ -23,7 +23,7 @@ Practicing with data
 
 Save it into your working directory.
 
-1.  To load the data:
+2.  To load the data:
 
 <!-- -->
 
@@ -33,7 +33,7 @@ Save it into your working directory.
         col_types = cols(X1 = col_skip()))  # this is to remove the first column, since it is redundant. 
     # View(data)
 
-1.  Installing relevant packages:
+3.  Installing relevant packages:
 
 <!-- -->
 
