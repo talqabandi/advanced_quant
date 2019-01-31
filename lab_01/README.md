@@ -63,7 +63,7 @@ Basic stats and data exploration
 
     rcorr(as.matrix(data))  ## correlation table of all the variables, but this also provides info on p-values of the relationships.
 
-    regression <- lm(sales ~ TV + radio, data = data)  ## regression.
+    regression <- lm(sales ~ TV + radio + newspaper, data = data)  ## regression.
     summary(regression)  ## regression results. 
 
 You can also create plots, for example:
