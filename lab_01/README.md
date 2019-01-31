@@ -85,3 +85,14 @@ You can also create plots, for example:
     corrplot.mixed(corr_plot)  ## with mixed graphics to represent direction and strength
 
 ![](lab01_files/figure-markdown_strict/plots-4.png)
+
+
+    ## -- Plotting regression -- ##
+    attach((data))
+    
+    ## plots scatterplot
+    plot(radio, sales, main="Scatterplot Example",
+     xlab="Radio Advertising ", ylab="Sales", pch=19) 
+
+    ## adding regression line:
+    abline(lm(sales~radio), col="red") # regression line (y~x) 
