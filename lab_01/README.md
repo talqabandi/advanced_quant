@@ -88,7 +88,7 @@ You can also create plots, for example:
 
 
     ## -- Plotting regression -- ##
-    attach((data))
+    attach(data)
     
     ## plots scatterplot
     plot(radio, sales, main="Scatterplot Example",
