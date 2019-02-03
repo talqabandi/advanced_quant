@@ -5,11 +5,11 @@ Download R and RStudio
 
 <https://cran.cnr.berkeley.edu/>
 
-1.  Then download R Studio:
+2.  Then download R Studio:
 
 <https://www.rstudio.com/products/rstudio/download/>
 
-1.  Set your working directory:
+3.  Set your working directory:
 
 <!-- -->
 
@@ -23,7 +23,7 @@ Practicing with data
 
 Save it into your working directory.
 
-1.  To load the data:
+2.  To load the data:
 
 <!-- -->
 
@@ -33,7 +33,7 @@ Save it into your working directory.
         col_types = cols(X1 = col_skip()))  # this is to remove the first column, since it is redundant. 
     # View(data)
 
-1.  Installing relevant packages:
+3.  Installing relevant packages:
 
 <!-- -->
 
@@ -63,7 +63,7 @@ Basic stats and data exploration
 
     rcorr(as.matrix(data))  ## correlation table of all the variables, but this also provides info on p-values of the relationships.
 
-    regression <- lm(sales ~ TV + radio, data = data)  ## regression.
+    regression <- lm(sales ~ TV + radio + newspaper, data = data)  ## regression.
     summary(regression)  ## regression results. 
 
 You can also create plots, for example:
@@ -85,3 +85,14 @@ You can also create plots, for example:
     corrplot.mixed(corr_plot)  ## with mixed graphics to represent direction and strength
 
 ![](lab01_files/figure-markdown_strict/plots-4.png)
+
+
+    ## -- Plotting regression -- ##
+    attach(data)
+    
+    ## plots scatterplot
+    plot(radio, sales, main="Scatterplot Example",
+     xlab="Radio Advertising ", ylab="Sales", pch=19) 
+
+    ## adding regression line:
+    abline(lm(sales~radio), col="red") # regression line (y~x) 
