@@ -2,7 +2,7 @@ Downloading data from ICPSR
 ---------------------------
 
 -   Please **download** and follow the instructions found on this PDF
-    [link](lab_02/ICPSR%20and%20downloading%20data.pdf).
+    [link](lab_02/downloading-ICPSR-data.pdf).
 -   To be able to "click" on the links, you'll have to download the
     file.
 -   Once you've downloaded the data from ICPSR:
