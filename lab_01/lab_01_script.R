@@ -60,3 +60,7 @@ plot(radio, sales, main="Scatterplot Example",
 ## adding fit line:
 abline(lm(sales~radio), col="red") # regression line (y~x) 
 
+
+## -- some basic diagnostics of a regression -- ##
+plot(regression)
+
