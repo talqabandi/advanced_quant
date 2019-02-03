@@ -109,8 +109,20 @@ variables <- c("PUBID", "CCSITE", "FWSITE", "HOSITE", "racode", "RAYEAR", "ZFEMA
     "INCC1417", "INCC2T17")
 ```
 
-Next, we're going to keep only those listed above:
+Next, we're going to keep only those listed above, which we will save as a `.csv` file. That way you can just load it normally whenever you need to use it:
+
+-   **just make sure to put `.csv` at the end**
 
 ``` r
-data <- texas_data[, names(texas_data) %in% variables]
+data <- texas_data[, names(texas_data) %in% variables]  ## Creating our new, Texas-only dataset, with just the variables we are interested in.  
+```
+
+``` r
+write.csv(data, file = "C:/LOCATION/YOU/WOULD/LIKE/TO/SAVE/THE/DATA/NAME_IT_WHATEVER_YOU_WANT.csv")  ## this is how we can save a .csv file.  
+```
+
+Then, whenever you want to load the data, all you have to type is:
+
+``` r
+data <- fread(file = "C:/LOCATION/YOU/WOULD/LIKE/TO/SAVE/THE/DATA/NAME_IT_WHATEVER_YOU_WANT.csv")
 ```
