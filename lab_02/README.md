@@ -1,11 +1,18 @@
+Loading and preparing ICPSR data
+================================
+
 Downloading data from ICPSR
 ---------------------------
 
 -   Please **download** and follow the instructions found on this PDF
-    [link](downloading-ICPSR-data.pdf).
+    [link](downloading-ICPSR-data.pdf) before moving on to the next
+    steps.
 -   To be able to "click" on the links, you'll have to download the
     file.
--   Once you've downloaded the data from ICPSR:
+
+Once you've downloaded the data from ICPSR:
+-------------------------------------------
+
 -   **unzip** the folder  
 -   **make note of where the *unzipped* folder is saved**.
 
