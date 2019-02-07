@@ -98,15 +98,14 @@ First, we have to create a list of the variables we want, which we will assign t
 ``` r
 variables <- c("PUBID", "CCSITE", "FWSITE", "HOSITE", "racode", "RAYEAR", "ZFEMALE", 
     "ZAGELT25", "ZAGE2534", "ZAGEGT35", "ZHISP", "ZBLACK", "ZWHITE", "ZOTHETH", 
-    "ZPENG", "NOHSGED", "ZNEVMAR", "Z1PARENT", "TCHCNT", "ZACH05", "ZACH612", 
-    "ZACH1318", "ZYNG05", "ZRENTALH", "ZPUBLICH", "ZFT", "ZPT", "HRWGCAT", "MNTHEMP", 
-    "ZNOMEMP", "ZGT24MEMP", "STRECIP", "LTRECIP", "YR3KEMP", "YR3EARNAV", "YREMP", 
-    "YR1KEMP", "pyrearn", "EMPPQ1", "PEARN1", "STRTDUM", "YRREC", "YRKREC", 
-    "GYRWL", "NMOFWELF", "YRRFS", "YRKRFS", "GYRFS", "GEMP1417", "EM4Q1417", 
-    "KEMP2T17", "GEMP2T17", "EM4Q2T17", "GEMP14_0", "EMPCNT2T17", "EARN1417", 
-    "ER4GE10K", "EARN2T17", "ER14GE40", "VREC1417", "KREC2T17", "WLC1417", "WLC2T17", 
-    "VRFS1417", "KRFS2T17", "FSC14T17", "FSC2T17", "TOTSTP", "TOTNSTP", "VSTP1T48", 
-    "INCC1417", "INCC2T17")
+    "NOHSGED", "Z1PARENT", "TCHCNT", "ZACH05", "ZACH612", "ZACH1318", "ZYNG05", 
+    "ZRENTALH", "ZPUBLICH", "MNTHEMP", "ZNOMEMP", "ZGT24MEMP", "STRECIP", "LTRECIP", 
+    "YR3KEMP", "YR3EARNAV", "YREMP", "pyrearn", "EMPPQ1", "PEARN1", "YRREC", 
+    "YRKREC", "GYRWL", "YRRFS", "YRKRFS", "GYRFS", "GEMP1417", "EM4Q1417", "KEMP2T17", 
+    "GEMP2T17", "EM4Q2T17", "GEMP14_0", "EMPCNT2T17", "EARN1417", "ER4GE10K", 
+    "EARN2T17", "ER14GE40", "VREC1417", "KREC2T17", "WLC1417", "WLC2T17", "VRFS1417", 
+    "KRFS2T17", "FSC14T17", "FSC2T17", "TOTSTP", "TOTNSTP", "VSTP1T48", "INCC1417", 
+    "INCC2T17", "ZCUREMP")
 ```
 
 Next, we're going to keep only those listed above, which we will save as a `.csv` file. That way you can just load it normally whenever you need to use it:
