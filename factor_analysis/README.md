@@ -5,7 +5,10 @@ Installing and loading relevant packages:
 =========================================
 
 ``` r
-# install.packages('psych') install.packages('GPArotation')
+# install.packages('psych')
+
+# install.packages('GPArotation')
+
 # install.packages('corpcor')
 
 library(psych)
@@ -116,22 +119,22 @@ Print the output just by stating the name of the object we created. This will li
 ---------------------------------------------------------------------------------------------------------------------------
 
 ``` r
-pc1
+print.psych(pc1, cut = 0.3, sort = TRUE)
 ```
 
     ## Principal Components Analysis
     ## Call: principal(r = ced_likerts_for_analysis, nfactors = 9, rotate = "varimax")
     ## Standardized loadings (pattern matrix) based upon correlation matrix
-    ##         RC2  RC3  RC4  RC5  RC7  RC9  RC6  RC8  RC1 h2       u2 com
-    ## item13 0.06 0.11 0.22 0.16 0.87 0.28 0.20 0.10 0.16  1 -2.2e-16 1.7
-    ## item14 0.09 0.10 0.18 0.13 0.29 0.86 0.25 0.12 0.17  1  3.3e-16 1.8
-    ## item15 0.12 0.13 0.20 0.17 0.21 0.25 0.86 0.14 0.19  1  1.1e-16 1.8
-    ## item16 0.10 0.12 0.90 0.14 0.20 0.16 0.17 0.11 0.20  1 -2.2e-16 1.5
-    ## item17 0.17 0.14 0.25 0.23 0.18 0.19 0.20 0.21 0.83  1  5.6e-16 2.1
-    ## item18 0.31 0.20 0.13 0.21 0.11 0.13 0.15 0.85 0.19  1 -2.2e-16 1.9
-    ## item19 0.91 0.17 0.10 0.18 0.06 0.08 0.11 0.25 0.13  1  1.1e-16 1.4
-    ## item20 0.16 0.94 0.11 0.13 0.09 0.09 0.10 0.15 0.10  1  5.6e-16 1.3
-    ## item21 0.19 0.15 0.14 0.89 0.15 0.12 0.15 0.19 0.19  1  8.9e-16 1.6
+    ##        item  RC2  RC3  RC4  RC5  RC7  RC9  RC6  RC8  RC1 h2       u2 com
+    ## item19    7 0.91                                          1  1.1e-16 1.4
+    ## item20    8      0.94                                     1  5.6e-16 1.3
+    ## item16    4           0.90                                1 -2.2e-16 1.5
+    ## item21    9                0.89                           1  8.9e-16 1.6
+    ## item13    1                     0.87                      1 -2.2e-16 1.7
+    ## item14    2                          0.86                 1  3.3e-16 1.8
+    ## item15    3                               0.86            1  1.1e-16 1.8
+    ## item18    6 0.31                               0.85       1 -2.2e-16 1.9
+    ## item17    5                                         0.83  1  5.6e-16 2.1
     ## 
     ##                        RC2  RC3  RC4  RC5  RC7  RC9  RC6  RC8  RC1
     ## SS loadings           1.06 1.05 1.05 1.02 1.00 0.99 0.98 0.94 0.91
@@ -185,23 +188,23 @@ Print our results
 -----------------
 
 ``` r
-pc2
+print.psych(pc2, cut = 0.4, sort = TRUE)
 ```
 
     ## Principal Components Analysis
     ## Call: principal(r = ced_likerts_for_analysis, nfactors = 3, rotate = "varimax", 
     ##     scores = TRUE)
     ## Standardized loadings (pattern matrix) based upon correlation matrix
-    ##         RC1  RC2  RC3   h2     u2 com
-    ## item13 0.84 0.12 0.12 0.73 0.2708 1.1
-    ## item14 0.82 0.18 0.10 0.71 0.2853 1.1
-    ## item15 0.74 0.31 0.11 0.66 0.3418 1.4
-    ## item16 0.70 0.24 0.15 0.57 0.4286 1.3
-    ## item17 0.61 0.54 0.09 0.68 0.3239 2.0
-    ## item18 0.27 0.79 0.22 0.75 0.2528 1.4
-    ## item19 0.10 0.85 0.18 0.76 0.2358 1.1
-    ## item20 0.21 0.28 0.93 0.99 0.0082 1.3
-    ## item21 0.41 0.66 0.09 0.61 0.3866 1.7
+    ##        item  RC1  RC2  RC3   h2     u2 com
+    ## item13    1 0.84           0.73 0.2708 1.1
+    ## item14    2 0.82           0.71 0.2853 1.1
+    ## item15    3 0.74           0.66 0.3418 1.4
+    ## item16    4 0.70           0.57 0.4286 1.3
+    ## item17    5 0.61 0.54      0.68 0.3239 2.0
+    ## item19    7      0.85      0.76 0.2358 1.1
+    ## item18    6      0.79      0.75 0.2528 1.4
+    ## item21    9 0.41 0.66      0.61 0.3866 1.7
+    ## item20    8           0.93 0.99 0.0082 1.3
     ## 
     ##                        RC1  RC2  RC3
     ## SS loadings           3.08 2.36 1.02
