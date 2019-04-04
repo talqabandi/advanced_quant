@@ -162,7 +162,7 @@ Plot of eigenvalues
 plot(pc1$values, type = "b")
 ```
 
-![](Factor_Analysis__files/figure-markdown_github/plot-pc1-eigen-1.png)
+![](README_files/figure-markdown_github/plot-pc1-eigen-1.png)
 
 Based on your interpretation of your eigenvalues, change the nfactors to the number of factors you wish to specify.
 -------------------------------------------------------------------------------------------------------------------
