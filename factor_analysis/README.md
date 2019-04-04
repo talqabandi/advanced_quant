@@ -2,7 +2,7 @@ Factor Analysis
 ================
 
 Installing and loading relevant packages:
------------------------------------------
+=========================================
 
 ``` r
 # install.packages('psych') install.packages('GPArotation')
@@ -14,7 +14,7 @@ library(corpcor)
 ```
 
 Loading Data
-------------
+============
 
 Let's first reduce the dataset to the variables that we wish to analyze using this method.
 
@@ -35,7 +35,7 @@ ced_likerts_for_analysis <- CourseEvaluationData[, 20:28]
 ```
 
 Then let's create a correlation matrix
---------------------------------------
+======================================
 
 Which we will need in order to run the determinant function.
 
