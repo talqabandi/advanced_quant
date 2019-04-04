@@ -58,8 +58,8 @@ ced_matrix
     ## item20   0.31   0.31   0.35   0.33   0.39   0.46   0.41   1.00   0.39
     ## item21   0.44   0.42   0.48   0.42   0.57   0.54   0.48   0.39   1.00
 
-1. Interpret:
-=============
+1 Interpret:
+============
 
 The Kaiser-Meyer-Olkin measure of sampling adequacy, Bartlett’s test of Sphericity, and determinant in this case.
 -----------------------------------------------------------------------------------------------------------------
@@ -102,8 +102,8 @@ det(ced_matrix)
 
     ## [1] 0.01708989
 
-2. How many factors (components) should you choose? Why?
-========================================================
+2 How many factors (components) should you choose? Why?
+=======================================================
 
 We will be using a varimax rotation.
 ------------------------------------
