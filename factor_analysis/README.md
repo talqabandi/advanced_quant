@@ -58,7 +58,7 @@ ced_matrix
     ## item20   0.31   0.31   0.35   0.33   0.39   0.46   0.41   1.00   0.39
     ## item21   0.44   0.42   0.48   0.42   0.57   0.54   0.48   0.39   1.00
 
-1) Interpret the Kaiser-Meyer-Olkin measure of sampling adequacy, Bartlett’s test of Sphericity, and determinant in this case.
+1. Interpret the Kaiser-Meyer-Olkin measure of sampling adequacy, Bartlett’s test of Sphericity, and determinant in this case.
 ==============================================================================================================================
 
 What do these mean?
@@ -99,7 +99,7 @@ det(ced_matrix)
 
     ## [1] 0.01708989
 
-2) How many factors (components) should you choose? Why?
+2. How many factors (components) should you choose? Why?
 ========================================================
 
 We will be using a varimax rotation.
@@ -215,17 +215,17 @@ pc2
     ## 
     ## Fit based upon off diagonal values = 0.98
 
-3) Do the communalities concern you for any of the variables?
+3. Do the communalities concern you for any of the variables?
 =============================================================
 
 ### Examine h2 in the output above.
 
-4) What percentage of the variance does your factor solution explain?
+4. What percentage of the variance does your factor solution explain?
 =====================================================================
 
 ### Examine second part of output.
 
-5) Did the factors achieve simple structure? (no item cross load at .4 or more)
+5. Did the factors achieve simple structure? (no item cross load at .4 or more)
 ===============================================================================
 
 ### Interpret results.
@@ -264,17 +264,17 @@ print.psych(pc2, cut = 0.4, sort = TRUE)
     ## 
     ## Fit based upon off diagonal values = 0.98
 
-6) Explain all three factors in plain English. Use the rotated factor solution in this determination. A paragraph will suffice.
+6. Explain all three factors in plain English. Use the rotated factor solution in this determination. A paragraph will suffice.
 ===============================================================================================================================
 
 ### No R code
 
-7) Do you have any concerns about reverse coding?
+7. Do you have any concerns about reverse coding?
 =================================================
 
 ### No R code
 
-8) Perform a reliability analysis (using Cronbach’s Alpha) for your factors that are composed of more than two variables
+8. Perform a reliability analysis (using Cronbach’s Alpha) for your factors that are composed of more than two variables
 ========================================================================================================================
 
 ``` r
@@ -350,7 +350,7 @@ alpha(factor2)
     ## item18 0.00 0.03 0.07 0.20 0.36 0.34    0
     ## item21 0.00 0.02 0.09 0.21 0.43 0.24    0
 
-9) Advanced extenstion: regress each of the three factors (three regressions) on whether the professor was Male, salary, and years of experience. What do the results show?
+9. Advanced extenstion: regress each of the three factors (three regressions) on whether the professor was Male, salary, and years of experience. What do the results show?
 ===========================================================================================================================================================================
 
 ### Use previous regression instructions from assignment 1.
@@ -444,5 +444,5 @@ summary(factor2_regression)
     ## Multiple R-squared:  0.01394,    Adjusted R-squared:  0.01186 
     ## F-statistic:  6.71 on 3 and 1424 DF,  p-value: 0.0001702
 
-10) Write up your results in a page or less. Use Andy Field’s examples as a guide.
+10. Write up your results in a page or less. Use Andy Field’s examples as a guide.
 ==================================================================================
