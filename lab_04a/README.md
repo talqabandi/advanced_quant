@@ -171,14 +171,14 @@ quantile(full_data$KREC2T17, 0.75, na.rm = TRUE)
 
 We then use that number (17) as a cutoff for our dummy variable.
 
-We are going to call this new dummy variable, `KREC2T17_cat`. If a person has a KREC2T17 value less than 17, they will be assigned a value of 0 in the new KREC2T17\_cat column. If they have a value equal to or greather than 17, they will be assigned a value of 1 for KREC2T17\_cat.
+We are going to call this new dummy variable, `HighWelf`. If a person has a KREC2T17 value less than 17, they will be assigned a value of 0 in the new HighWelf column. If they have a value equal to or greather than 17, they will be assigned a value of 1 for HighWelf
 
 It is best to do all these lines one by one.
 
 ``` r
-full_data$KREC2T17_cat[full_data$KREC2T17 < 17] <- 0
-full_data$KREC2T17_cat[full_data$KREC2T17 >= 17] <- 1
-full_data$KREC2T17_cat <- factor(full_data$KREC2T17_cat)
+full_data$HighWelf[full_data$KREC2T17 < 17] <- 0
+full_data$HighWelf[full_data$KREC2T17 >= 17] <- 1
+full_data$HighWelf <- factor(full_data$HighWelf)
 ```
 
 ### 7. Splitting our full dataset into a train and test set.
@@ -187,7 +187,7 @@ Make sure that `library(caret)` worked when you ran it at the very beginning on 
 
 ``` r
 set.seed(89879878)
-trainIndex <- createDataPartition(full_data$KREC2T17_cat, p = 0.7, list = FALSE, 
+trainIndex <- createDataPartition(full_data$HighWelf, p = 0.7, list = FALSE, 
     times = 1)
 train_data <- full_data[trainIndex, ]  # Creating our training set
 test_data <- full_data[-trainIndex, ]  # creating our testing set
