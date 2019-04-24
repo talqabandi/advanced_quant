@@ -1,4 +1,4 @@
-Lab 4a: Preparing the data
+Lab 5a: Preparing the data
 ================
 
 ICPSR
@@ -55,13 +55,13 @@ If you have the `ICPSR_33181` saved elsewhere (if you're still very new to R, I 
 Insert/type/paste the location of the datasets into the code below, **but replace** `~/Dropbox/NSSR/2019 Spring/Advanced Quant - TA/ICPSR_33181/DS0003/33181-0003-Data.tsv` **with the location of the files on your computer**.
 
 ``` r
-ds01 <- fread(file = "D:/Tima/Dropbox/NSSR/2019 Spring/Advanced Quant - TA/ICPSR_33181/DS0001/33181-0001-Data.tsv", 
+ds01 <- fread(file = "/Users/timaalqabandi/Dropbox/NSSR/2019 Spring/Advanced Quant - TA/ICPSR_33181/DS0001/33181-0001-Data.tsv", 
     sep = "\t", header = TRUE)
 
-ds03 <- fread(file = "D:/Tima/Dropbox/NSSR/2019 Spring/Advanced Quant - TA/ICPSR_33181/DS0003/33181-0003-Data.tsv", 
+ds03 <- fread(file = "/Users/timaalqabandi/Dropbox/NSSR/2019 Spring/Advanced Quant - TA/ICPSR_33181/DS0003/33181-0003-Data.tsv", 
     sep = "\t", header = TRUE)
 
-ds04 <- fread(file = "D:/Tima/Dropbox/NSSR/2019 Spring/Advanced Quant - TA/ICPSR_33181/DS0004/33181-0004-Data.tsv", 
+ds04 <- fread(file = "/Users/timaalqabandi/Dropbox/NSSR/2019 Spring/Advanced Quant - TA/ICPSR_33181/DS0004/33181-0004-Data.tsv", 
     sep = "\t", header = TRUE)
 ```
 

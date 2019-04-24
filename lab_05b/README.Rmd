@@ -1,0 +1,584 @@
+---
+title: 'Lab 5b: Random Forests Notebook'
+author: "Tima Alqabandi"
+date: "April 11, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. The code is placed in "chunks" to allow clear delimination between text and code. When you execute code within the notebook, the results appear beneath the code. To execute a chunk, click the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*.   
+
+You can do your full assignment in this notebook. Then, please save it as an HTML file when you are done.  
+
+In this assignment, you will learn about the various Tree based models. As mentioned, Tree based models are a type of Machine Learning. They come to us from the field of computer science. They have some nice advantages:  
+
+* They provide a (usually) simple and easy to interpret display of the results that mimics human decision making (think decision trees).  
+* They are quite adept at detecting the optimum break points for nonlinear variables.   
+* They are inherantly good at picking up multi layered "dependencies" that we call interaction terms.  
+* Though the original tree is usually not very predictive, when trees are combined with boosting, bagging and decorrelation techniques they often are a top performing technique.   
+
+We are now in the world of predictive modelling. Our focus now is brute force prediction. In this world, even minor seeming improvements in predictive accuracy are important: they can translate into lives saved, millions earned, careers transformed. Every decimal counts for the person at the margin.  
+
+We will use the ICPSR data because you are now familar with it.  
+
+We are going to see if we can outdo logistic regression results. So we will start with logistic regression as our base model. But this is no "strawman." Logistic regression is a powerful technique that can often rise to the top. This method can be used for any problems that logistic regression takes on. You can use this method to predict any binary outcome.   
+
+So lets get started. First, lets load the required libraries and don't forget to set you working directory. To run this code, press the little arrow in the upper right corner. We'll load some tree packages as well as the caret package which is commonly used for cross validation.  
+
+```{r, eval=FALSE, include=FALSE}
+install.packages('tree')
+install.packages('randomForest')
+install.packages('caret')
+install.packages('e1071')
+install.packages('Rcpp')
+install.packages('pROC')
+install.packages("rpart")
+install.packages("rpart.plot")
+install.packages("rattle")
+```  
+
+```{r loading-packages}
+library(Rcpp)
+library(tree)
+library(randomForest)
+library(e1071)
+library(caret)
+library(pROC)
+library(rpart)
+options(scipen=999)
+library(rpart.plot)
+library(rattle)
+```  
+
+# Loading our data and creating our dependent variable.  
+
+1. First, as always, set your working directory.  
+
+2. Next, let's load our train and test data:  
+
+```{r loading-data}
+train <- read.csv("/Users/timaalqabandi/Dropbox/NSSR/2019 Spring/Advanced Quant - TA/data/train_data.csv")
+
+test <- read.csv("/Users/timaalqabandi/Dropbox/NSSR/2019 Spring/Advanced Quant - TA/data/test_data.csv")
+
+## We need to make sure that our dependent variable if a "factor" in both our train and test data
+test$HighWelf = as.factor(test$HighWelf)
+train$HighWelf = as.factor(train$HighWelf)
+```  
+
+3. Let's create an object, "HighWelf_value" and merge it into our dataset.  
+```{r creating-highwelf_value}
+HighWelf_value_train = ifelse(train$HighWelf == 0, "No", "Yes")
+train = data.frame(train, HighWelf_value_train)
+
+HighWelf_value_test = ifelse(test$HighWelf == 0, "No", "Yes")
+test = data.frame(test, HighWelf_value_test)
+```  
+
+# Creating a logistic regression model using the same variables used in your linear regression homework.  
+
+```{r}
+
+# LOGISTIC MODEL -------------------------
+
+# (1) Create Model using all the features from the last assignment
+
+lgs_regression <- glm(HighWelf ~ CCSITE + FWSITE + HOSITE + ZAGELT25 + ZHISP +
+    ZBLACK + ZACH05 + ZPUBLICH + MNTHEMP + LTRECIP + YR3KEMP + YR3EARNAV +
+    YREMP + pyrearn + YRREC + YRKREC + YRRFS + RAYEAR, family=binomial, data=train)
+summary(lgs_regression)
+
+# (2) Run Diagnostics
+
+exp(coef(lgs_regression))
+#logisticPseudoR2s(lgs_regression)
+
+# (3) Insert model probability into our dataset
+
+prob_final = predict(lgs_regression,type="response")
+train$prob_final <- prob_final
+
+quantile(train$prob_final)
+
+# (4) Predict "HighWelf" or "Not" based on model
+
+pred_final = rep(0, 544) # Creates a vector of 544 "not highwelf" elements. 544 is the number of rows that are present in the dataset. The code below will lable those with probabilities of more than 0.5 as being in HighWelf
+
+pred_final[train$prob_final>0.5] = 1 # Changes the "Not" elements to "yes" in terms of "HighWelf" if probability is above 0.5. This is known as the threshold. Feel free to change this if you'd like!
+
+pred_final[1:40] ## This will show us the predictions for the first 40 rows
+train$pred_final <- pred_final
+
+table(train$pred_final)
+table(pred_final,train$HighWelf) # Confusion table that compares our prediction to the Survived that was reality
+## we see that our model predicted that no one was in HighWelf. That has to do with the 0.5 threshold.
+
+# Accuracy
+table <- table(pred_final,train$HighWelf)
+Accuracy <- sum(diag(table)/sum(table))
+print(paste('Accuracy: ', Accuracy))
+
+# Calculate AUC and plot ROC curve
+prob_log = predict(lgs_regression, type ='response')
+auc(train$HighWelf, prob_log)
+plot(roc(train$HighWelf, prob_log))
+
+```
+*In this space below (before the next code block), report the accuracy of this model and the area under the curve. These are two different criteria. Explain what they tell you. This will be your baseline that we'll try to improve with the tree models. Also, please describe the coeffecients in the model (what significant and what is the nature of the relationships?)
+
+
+
+
+
+
+
+
+
+
+
+
+Insert Answer in the space above. Then, lets now move on to the next step. 
+
+One of the flaws of "entry level" decision trees, that is, a decision tree based on a whole dataset, is that they tend to "overfit" the data. At an extreme, they can memorize your dataset. So in order to properly evaluate the performance of a classification tree on these data, we must estimate the *test error* rather than simply computing the training error. That is why we created train and test datasets in lab 5a. 
+
+We need to make sure that we build our trees using only the training set. Which we will then evaluate by running on our unseen test data. This is how we can generalize our models to the outside world. 
+
+One way to build even better models is by creating a **validation dataset**. Think of this as a pseudo "test" dataset. It is pseudo because before we go on to test our final model on our test data, we will run it on our validation set first. To do this, we will need to split our **train** data one more time: This time into a validation set and a smaller training set.
+
+These steps play out below. As usual, we'll set a "seed" value. This is a way of drawing a random sample but ensuring that we get the same result every time. We do that so that we can replicate our results. We will define a train sample, where we will build our tree. But, critically, we will test the tree on a validation sample, before we test it on unseen "fresh" test data. This is the fundamental takeway from "out of sample prediction" which is one of key key contributions of modern data science. So we'll pull a sample of 80% in the training sample. The remainder will be in the validation sample. 
+
+```{r}
+# Split train/validation
+set.seed(100)
+trainIndex <- createDataPartition(train$HighWelf, p = .8, list = FALSE, times = 1)
+train_data <- train[ trainIndex,] # Creating our training set
+val_data  <- train[-trainIndex,] # creating our testing set
+```
+
+# Building our first tree.  
+
+```{r}
+
+# TREE GROWTH -------------------------
+
+# (1) Starter train Tree 
+# Let's create a tree using the variables from the linear regression assignemt, just to get our feet wet. 
+# We will test this tree against our test data, which is "unseen" by the model, to see how well it could predict those who would be HighWelf
+
+tree_train = rpart(HighWelf ~ CCSITE + FWSITE + HOSITE + ZAGELT25 + ZHISP +
+    ZBLACK + ZACH05 + ZPUBLICH + MNTHEMP + LTRECIP + YR3KEMP + YR3EARNAV +
+    YREMP + pyrearn + YRREC + YRKREC + YRRFS + RAYEAR, data=train_data, method="class")
+summary(tree_train)
+
+# How many terminal nodes does this tree have? What does the misclassification error mean?
+fancyRpartPlot(tree_train)
+
+# Evaluate performance on new data ('val')
+
+train_pred = predict(tree_train, val_data, type="class")
+confusionMatrix(train_pred, val_data$HighWelf, positive="1")
+
+```
+
+##### Using the lecture notes and the text, please explain what just happened. How does the tree work? How is it deciding which variables to split on and where to split. Please explain what is happening statistically. What is the significance (if any) of "YRRFS" being the first split variable? For two of the leaves, describe the pathway of who ended up in the leaf. Open the output above in the "R console" view. Try to figure out how to interpret it. Which terminal node had the highest HighWelf rate? Does it make sense based on what you know about the data? Which terminal node had the lowest HighWelf rate? 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Answer the question in the space above. 
+
+
+
+##### Now, comment on the overall accuracy of this starter tree? How does it compare to the logistic regression? Comment on some of the other diagnostics. What does the "sensitivity" mean? What about "specificity"? Google to remind your self what these terms mean. See https://www.theanalysisfactor.com/sensitivity-and-specificity/ or https://www.med.emory.edu/EMAC/curriculum/diagnosis/sensand.htm
+
+
+
+
+
+
+
+Answer above
+
+# Pruning the tree  
+
+Notice the tree that was produced above. There are many branches and leaves. This is what we'd call a "bushy" tree. It is likely still overfitting the data. Let us therefore "prune" the tree to get a more reliable results. 
+
+Although you may think more nodes is better, that often means overfitting, leading to poor test performance.
+A smaller tree with fewer splits could lead to better test results. This is achieved by pruning the tree.
+
+To prune this tree, we will use the function printcp() and will look at the `xerror` column specifically.  We want the smallest xerror value (which stands for cross-validated error.)
+
+```{r pruning}
+printcp(tree_train)
+```    
+
+
+The plot below shows us that error rises as we split the data. And the function below that gives us the number of splits for the smallest xerror.   
+```{r pruning-2}
+plotcp(tree_train)
+
+tree_train$cptable[which.min(tree_train$cptable[,"xerror"]),"CP"]
+```
+
+It just so happens, with our dataset and our dependent variable, that the smallest xerror happens to involve 0.0237 splits, which is closer to "no pruning."   
+
+With that said, however, for learning purposes, I will show you what you would do to prune the tree using the smallest xerror. Running this may not work, so don't worry if you get an error when you run the plot() function.  
+
+```{r pruning-2}
+prune_tree_train <- prune(tree_train, 
+                      cp=tree_train$cptable[which.min(tree_train$cptable[,"xerror"]),"CP"])
+
+plot(prune_tree_train, main="Pruned Classification Tree")
+```  
+
+
+
+After pruning a tree, we would check to see if it performed better than the unpruned version. To do this, we would create predictions based on the pruned tree and compare the confusion matrix to the one we created above. (Again, this will not output anything, or if it does, the performance will be really poor, because the original tree performed best with *no pruning*. I just wanted to give you the code for when you create a tree using the new variables we added to our dataset for this assignment.  
+```{r pruned-predictions}
+# Evaluate pruned performance on some "new"" data ('val_data')
+
+pruned_train_pred = predict(prune_tree_train, val_data, type="class")
+confusionMatrix(pruned_train_pred, val_data$HighWelf, positive="1")
+```
+
+
+When you use the new variables, tell us whether the pruning improved the error? How about the accuracy? Looking at your text, the notes or the web explain some of the pruning options that we choose above and explain how pruning works.
+
+
+
+
+
+Write above.
+
+
+At this point, you are more likely to see only minor improvements. The concepts of bagging, boosting, and random forests are designed to turn trees from mediocre predictors into top rate algorithms.   
+
+
+# BAGGING ------------------------- 
+
+Bagging is our introduction to the concept of random forests. 
+To apply bagging to classification/regression trees, we bootstrap the training sets and average the resulting predictions.
+The code looks very similar to random forests, but we set `mtry` to the number of actual predictors, instead of a subset of predictors (which is what we do in random forests).
+
+We will be using the `caret` package for this. Caret is a really cool easy-to-understand machine learning package on R. You can read more about it here: http://topepo.github.io/caret/.
+
+In order to create a bagged model (and for the rest of the ensemble methods to follow), we need to set some parameters to run. One of those is cross-validation. This will help us get better prediction results. 
+
+```{r fitcontrol}
+fitControl <- trainControl(## 5-fold CV
+                           method = "repeatedcv",
+                           number = 5,
+                           ## repeated 3 times
+                           repeats = 3)
+```
+
+Next, we need to define our X and our Y.
+
+Defining X:
+```{r defining-x}
+predictors = c("CCSITE" , "FWSITE" , "HOSITE" , "ZAGELT25" , "ZHISP" ,
+    "ZBLACK" , "ZACH05" , "ZPUBLICH" , "MNTHEMP" , "LTRECIP" , "YR3KEMP" , "YR3EARNAV" ,
+    "YREMP" , "pyrearn" , "YRREC" , "YRKREC" , "YRRFS" , "RAYEAR" )
+x <- train_data[, (names(train_data) %in% predictors)]
+y = train_data$HighWelf
+```
+
+```{r}
+set.seed(825)
+bag_model <- caret::train(x, y, 
+                          method = "rf",
+                          trControl = fitControl,
+                          tuneGrid=expand.grid(mtry=18) # The total number of predictors we put into our model
+                          )
+bag_model
+
+# Let's make predictions with the val set of data.
+pred_bag = predict(bag_model, newdata = val_data)
+confusionMatrix(pred_bag, val_data$HighWelf, positive="1")
+
+# notice that we aren't predicting all that well. To adjust the threshold, we will run:
+library(pROC)
+probsROC <- predict(bag_model, val_data, type = "prob")
+rocCurve   <- roc(response = val_data$HighWelf,
+                      predictor = probsROC[, "1"],
+                      levels = rev(levels(val_data$HighWelf)))
+plot(rocCurve, print.thres = "best") # this is the best threshold, where best means highest combined specificity and sensitivity. So let's adjust accordingly with our predictions on the validation set.
+
+# But you feel free to adjust the threshold however you want when you're building your mdoel. 
+
+## Now, let's rerun the codes in lines 309 and 310 with this new threshold in mind:  
+
+pred_bag = predict(bag_model, newdata = val_data, type = "prob")
+threshold <- 0.345
+bagpred      <- factor( ifelse(pred_bag[, "1"] > threshold, "1", "0") )
+bagpred      <- relevel(bagpred, "1")   # you may or may not need this; I did
+confusionMatrix(bagpred, val_data$HighWelf, positive="1")
+
+#dev.off(); 
+plot(bagpred, val_data$HighWelf)
+
+# Accuracy
+table <- table(bagpred,val_data$HighWelf)
+Accuracy <- sum(diag(table)/sum(table))
+print(paste('Accuracy: ', Accuracy))
+
+# Plotting ROC curve
+prob_bag = predict(bag_model, newdata = val_data, type ='prob')
+auc(val_data$HighWelf, prob_bag[,2])
+plot(roc(val_data$HighWelf, prob_bag[,2]))
+
+# Did bagging improve the accuracy?
+```
+Did bagging improve the accuracy? If not, are you still okay with the results? Why or why not? If it did improve accuracy, are you happy with the results? Why or why not? Do you prefer other performance metrics (i.e. True positive rate, True Negative rate etc)?
+
+
+
+
+
+Answer above
+
+To really get a boost, we will run a random forest. The key insight of random forests is similar to the key insight of portfolio diversification theory in finance. By "decorrelating" the decision trees we have a better chance of having a better solution. To accomplish this, random forests combining bagging (that is running lots of trees on bootstrap samples) with a decorrelation. At each branch, a typical random forest will only consider the square root of the variable set. For example, if you have 36 predictors, at each node, the procedure will consider only 6 of the variables for the optimal split. Lets see how this goes:
+
+```{r}
+# RANDOM FOREST ------------------------- 
+# Now we will limit the number of predictors allowed using mtry
+# Let's set it to sqrt(18) predictors and examine our results. 
+
+set.seed(825)
+rf_model <- caret::train(x, y, 
+                          method = "rf",
+                          trControl = fitControl,
+                          tuneGrid=expand.grid(mtry=sqrt(18)) # The total number of predictors we put into our model
+                          )
+rf_model
+
+# Let's make predictions with the validation set of data.
+pred_rf = predict(rf_model, newdata = val_data)
+confusionMatrix(pred_rf, val_data$HighWelf, positive="1")
+
+# notice that we aren't predicting all that well. To adjust the threshold, we will run:
+library(pROC)
+probsROC <- predict(rf_model, val_data, type = "prob")
+rocCurve   <- roc(response = val_data$HighWelf,
+                      predictor = probsROC[, "1"],
+                      levels = rev(levels(val_data$HighWelf)))
+plot(rocCurve, print.thres = "best") # this is the best threshold, where best means highest combined specificity and sensitivity. So let's adjust accordingly with our predictions on the validation set.
+
+# But you feel free to adjust the threshold however you want when you're building your mdoel. 
+
+## Now, let's rerun the codes in lines 369 and 370 with this new threshold in mind:  
+
+pred_rf = predict(rf_model, newdata = val_data, type = "prob")
+threshold <- 0.163
+rfpred      <- factor( ifelse(pred_rf[, "1"] > threshold, "1", "0") )
+rfpred      <- relevel(rfpred, "1")   # you may or may not need this; I did
+confusionMatrix(rfpred, val_data$HighWelf, positive="1")
+
+#dev.off(); 
+plot(rfpred, val_data$HighWelf)
+
+# Accuracy
+table <- table(rfpred,val_data$HighWelf)
+Accuracy <- sum(diag(table)/sum(table))
+print(paste('Accuracy: ', Accuracy))
+
+# Plotting ROC curve
+prob_rf = predict(rf_model, newdata = val_data, type ='prob')
+auc(val_data$HighWelf, prob_rf[,2])
+plot(roc(val_data$HighWelf, prob_rf[,2]))
+
+```
+
+Did the accuracy improve?? Please explain how bagging, boosting and random forests improve prediction. Use the text and your notes to explain.
+
+
+
+
+Answer above.
+
+
+We are now into the world of "black box" machine learning algorithms. We get a good prediction, but we are now using hundreds of trees on random subsets of variables to get this improvement. This is the price we pay for better predictions, but it is a big deal. Again, better predictions means fewer children with lead poisoning, fewer people unjustifiably incarcerated or misdiagnosed. But random forests do come with a nice tool for understanding what is driving the predictions. This is called the variable importance measure. We'll run it below. 
+
+```{r}
+# Examine the importance of each variable. What is your analysis?
+varImp(bag_model)
+varImp(rf_model)
+```
+
+Interpret the output above. Any surprises? Do the results seem intuitive? using the book as a guide, explain how the variable importance statisics are derived.
+
+
+
+
+
+Answer above. 
+
+
+# Choose your "best" model and run on the Test data
+
+Choose whichever model you prefer best. The term best here is used loosely, so feel free to determine how to define it and explain your reasons below.  
+
+To illustrate, I will choose the random forest model.  
+
+```{r model-on-test}
+test_pred_rf = predict(rf_model, newdata = test, type = "prob")
+threshold <- 0.163
+test_rfpred      <- factor( ifelse(test_pred_rf[, "1"] > threshold, "1", "0") )
+test_rfpred      <- relevel(test_rfpred, "1")   # you may or may not need this; I did
+confusionMatrix(test_rfpred, test$HighWelf, positive="1")
+
+#dev.off(); 
+plot(test_rfpred, test$HighWelf)
+
+# Accuracy
+table <- table(test_rfpred,test$HighWelf)
+Accuracy <- sum(diag(table)/sum(table))
+print(paste('Accuracy: ', Accuracy))
+
+# Plotting ROC curve
+prob_rf = predict(rf_model, newdata = test, type ='prob')
+auc(test$HighWelf, prob_rf[,2])
+plot(roc(test$HighWelf, prob_rf[,2]))
+```  
+
+Explain your results.
+
+
+
+
+
+
+
+
+
+
+
+Write answer above. 
+
+
+# ADVANCED EXTENSIONS ------------------------- 
+
+(1) In the bagging model (code is in the chunk below), change the # of trees using ntree. First run with 2 trees, then with 25, then with 2500 trees then with 250,000 trees (this will take a few minutes to run depending on the power of your system). What happens to the accuracy at each step?
+
+
+
+
+
+Report your findings above.
+```{r}
+bag_ext = randomForest(HighWelf ~ CCSITE + FWSITE + HOSITE + ZAGELT25 + ZHISP +
+    ZBLACK + ZACH05 + ZPUBLICH + MNTHEMP + LTRECIP + YR3KEMP + YR3EARNAV +
+    YREMP + pyrearn + YRREC + YRKREC + YRRFS + RAYEAR, data=train_data, mtry=18, ntree=2500) # Adjust this last parameter.
+
+pred_ext_bag = predict(bag_ext, newdata = test)
+confusionMatrix(pred_ext_bag, test$HighWelf, positive = "1")
+#dev.off(); 
+plot(pred_ext_bag, test$HighWelf)
+
+```  
+
+
+(2) Change the number of predictors allowed in the random forest growth. Report on whether it changed the prediction accuracy. First use Mtry=4, then 6. e. Why do you think the accuracy is actually better when you try fewer variables? (think about the concept of decorrelation)
+
+
+
+
+
+
+
+Report on your results above
+
+```{r}
+# How are the results different when mtry is 4?
+set.seed(825)
+rf_model_4 <- caret::train(x, y, 
+                          method = "rf",
+                          trControl = fitControl,
+                          tuneGrid=expand.grid(mtry=4) # The total number of predictors we put into our model
+                          )
+rf_model_4
+
+
+pred_rf_4 = predict(rf_model_4, newdata = test)
+confusionMatrix(pred_rf_4, test$HighWelf, positive = "1")
+
+table <- table(pred_rf_4,test$HighWelf)
+Accuracy <- sum(diag(table)/sum(table))
+print(paste('Accuracy: ', Accuracy))
+
+varImp(rf_model_4)
+
+# How are the results different when mtry is 6?
+set.seed(825)
+rf_model_6 <- caret::train(x, y, 
+                          method = "rf",
+                          trControl = fitControl,
+                          tuneGrid=expand.grid(mtry=6) # The total number of predictors we put into our model
+                          )
+rf_model_6
+
+
+pred_rf_6 = predict(rf_model_6, newdata = test)
+confusionMatrix(pred_rf_6, test$HighWelf, positive = "1")
+
+table <- table(pred_rf_6,test$HighWelf)
+Accuracy <- sum(diag(table)/sum(table))
+print(paste('Accuracy: ', Accuracy))
+
+varImp(rf_model_6)
+```
+
+(3) We will now try an advanced method called boosting. This is a sequential process where the model slowly "hones in" on cases that it is having trouble predicting. Look at the notes and the text and first note if boosting improved things and then explain a little more about how it works. Interpret all of the output.
+
+
+
+
+
+Summarize above.
+
+```{r}
+
+# (3) Boosting
+
+# install.packages('gbm')
+library(gbm)
+set.seed(1)
+
+boost_model = caret::train(x, y, 
+                          method = "gbm",
+                          trControl = fitControl,
+                          tuneGrid=expand.grid(interaction.depth = 3, n.minobsinnode = 10, n.trees = 5000, shrinkage = 0.001)
+                          )
+summary(boost_model)
+boost_model
+
+prob_boost <- predict(boost_model, newdata = test, type='prob') 
+prob_boost
+
+
+HighWelf_boost_results <- rep('0', 231)
+HighWelf_boost_results[test$HighWelf =='1'] = '1'
+#HighWelf_boost_results
+pred_boost = rep('0', 231)
+pred_boost[prob_boost$`1` > 0.5] = '1'
+# pred_boost
+
+table(pred_boost, HighWelf_boost_results)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
