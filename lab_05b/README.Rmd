@@ -78,9 +78,21 @@ HighWelf_value_test = ifelse(test$HighWelf == 0, "No", "Yes")
 test = data.frame(test, HighWelf_value_test)
 ```  
 
-# Creating a logistic regression model using the same variables used in your linear regression homework.  
+# Creating a logistic regression model using the same variables used in your linear regression homework and a few new variables. All are listed below.   
 
 ```{r}
+
+# Variables we are interested in -------------------------
+
+## I am writing it here for easy of copying and pasting:
+# CCSITE + FWSITE + HOSITE + ZAGELT25 + ZHISP +
+#     ZBLACK + ZACH05 + ZPUBLICH + MNTHEMP + LTRECIP + YR3KEMP + YR3EARNAV +
+#     YREMP + pyrearn + YRREC + YRKREC + YRRFS + RAYEAR + 
+# KRFS2T17 +
+#   FSC2T17 + INCC1417 + GEMP2T17 + KEMP2T17 + EARN1417 + EMPCNT2T17 + E1G1 + YRKRFS + ARESERN
+# + GYRFS + INCC2T17 + E1E4A + ARESERN + PEARN1 +E1I1 + AHIGHGRAD
+
+
 
 # LOGISTIC MODEL -------------------------
 
@@ -88,7 +100,9 @@ test = data.frame(test, HighWelf_value_test)
 
 lgs_regression <- glm(HighWelf ~ CCSITE + FWSITE + HOSITE + ZAGELT25 + ZHISP +
     ZBLACK + ZACH05 + ZPUBLICH + MNTHEMP + LTRECIP + YR3KEMP + YR3EARNAV +
-    YREMP + pyrearn + YRREC + YRKREC + YRRFS + RAYEAR, family=binomial, data=train)
+    YREMP + pyrearn + YRREC + YRKREC + YRRFS + RAYEAR + 
+ KRFS2T17 + FSC2T17 + INCC1417 + GEMP2T17 + KEMP2T17 + EARN1417 + EMPCNT2T17 + E1G1 + YRKRFS + ARESERN
+ + GYRFS + INCC2T17 + E1E4A + ARESERN + PEARN1 +E1I1 + AHIGHGRAD, family=binomial, data=train)
 summary(lgs_regression)
 
 # (2) Run Diagnostics
@@ -170,7 +184,9 @@ val_data  <- train[-trainIndex,] # creating our testing set
 
 tree_train = rpart(HighWelf ~ CCSITE + FWSITE + HOSITE + ZAGELT25 + ZHISP +
     ZBLACK + ZACH05 + ZPUBLICH + MNTHEMP + LTRECIP + YR3KEMP + YR3EARNAV +
-    YREMP + pyrearn + YRREC + YRKREC + YRRFS + RAYEAR, data=train_data, method="class")
+    YREMP + pyrearn + YRREC + YRKREC + YRRFS + RAYEAR + 
+ KRFS2T17 + FSC2T17 + INCC1417 + GEMP2T17 + KEMP2T17 + EARN1417 + EMPCNT2T17 + E1G1 + YRKRFS + ARESERN
+ + GYRFS + INCC2T17 + E1E4A + ARESERN + PEARN1 +E1I1 + AHIGHGRAD, data=train_data, method="class")
 summary(tree_train)
 
 # How many terminal nodes does this tree have? What does the misclassification error mean?
@@ -233,7 +249,7 @@ plotcp(tree_train)
 tree_train$cptable[which.min(tree_train$cptable[,"xerror"]),"CP"]
 ```
 
-It just so happens, with our dataset and our dependent variable, that the smallest xerror happens to involve 0.0237 splits, which is closer to "no pruning."   
+It just so happens, with our dataset and our dependent variable, that the smallest xerror happens to involve 0.0508 splits, which is closer to "no pruning."   
 
 With that said, however, for learning purposes, I will show you what you would do to prune the tree using the smallest xerror. Running this may not work, so don't worry if you get an error when you run the plot() function.  
 
@@ -246,7 +262,7 @@ plot(prune_tree_train, main="Pruned Classification Tree")
 
 
 
-After pruning a tree, we would check to see if it performed better than the unpruned version. To do this, we would create predictions based on the pruned tree and compare the confusion matrix to the one we created above. (Again, this will not output anything, or if it does, the performance will be really poor, because the original tree performed best with *no pruning*. I just wanted to give you the code for when you create a tree using the new variables we added to our dataset for this assignment.  
+After pruning a tree, we would check to see if it performed better than the unpruned version. To do this, we would create predictions based on the pruned tree and compare the confusion matrix to the one we created above. (Again, this will not output anything, or if it does, the performance will be really poor, because the original tree performed best with *no pruning*. I just wanted to give you the code in case you wanted to do some exploring.  
 ```{r pruned-predictions}
 # Evaluate pruned performance on some "new"" data ('val_data')
 
@@ -291,7 +307,9 @@ Defining X:
 ```{r defining-x}
 predictors = c("CCSITE" , "FWSITE" , "HOSITE" , "ZAGELT25" , "ZHISP" ,
     "ZBLACK" , "ZACH05" , "ZPUBLICH" , "MNTHEMP" , "LTRECIP" , "YR3KEMP" , "YR3EARNAV" ,
-    "YREMP" , "pyrearn" , "YRREC" , "YRKREC" , "YRRFS" , "RAYEAR" )
+    "YREMP" , "pyrearn" , "YRREC" , "YRKREC" , "YRRFS" , "RAYEAR" , 
+ "KRFS2T17" , "FSC2T17" , "INCC1417" , "GEMP2T17" , "KEMP2T17" , "EARN1417" , "EMPCNT2T17" , "E1G1" , "YRKRFS" , "ARESERN"
+ , "GYRFS" , "INCC2T17" , "E1E4A" , "PEARN1" , "E1I1" , "AHIGHGRAD") 
 x <- train_data[, (names(train_data) %in% predictors)]
 y = train_data$HighWelf
 ```
@@ -301,7 +319,7 @@ set.seed(825)
 bag_model <- caret::train(x, y, 
                           method = "rf",
                           trControl = fitControl,
-                          tuneGrid=expand.grid(mtry=18) # The total number of predictors we put into our model
+                          tuneGrid=expand.grid(mtry=34) # The total number of predictors we put into our model
                           )
 bag_model
 
@@ -319,10 +337,10 @@ plot(rocCurve, print.thres = "best") # this is the best threshold, where best me
 
 # But you feel free to adjust the threshold however you want when you're building your mdoel. 
 
-## Now, let's rerun the codes in lines 309 and 310 with this new threshold in mind:  
+## Now, let's rerun the codes in lines 327 and 328 with this new threshold in mind:  
 
 pred_bag = predict(bag_model, newdata = val_data, type = "prob")
-threshold <- 0.345
+threshold <- 0.317 # we got this number from the plot.
 bagpred      <- factor( ifelse(pred_bag[, "1"] > threshold, "1", "0") )
 bagpred      <- relevel(bagpred, "1")   # you may or may not need this; I did
 confusionMatrix(bagpred, val_data$HighWelf, positive="1")
@@ -342,7 +360,11 @@ plot(roc(val_data$HighWelf, prob_bag[,2]))
 
 # Did bagging improve the accuracy?
 ```
-Did bagging improve the accuracy? If not, are you still okay with the results? Why or why not? If it did improve accuracy, are you happy with the results? Why or why not? Do you prefer other performance metrics (i.e. True positive rate, True Negative rate etc)?
+Did bagging improve the accuracy? If not, are you still okay with the results? Why or why not? If it did improve accuracy, are you happy with the results? Why or why not? Do you prefer other performance metrics than just accuracy (i.e. True positive rate, True Negative rate etc)? What if you ran lines 327 and 328 once more and then jumped straight to lines 342 onwards-- what results do you get then? Do you prefer those better? Why or why not? Feel free to adjust the threshold as you please.
+
+
+
+
 
 
 
@@ -355,13 +377,13 @@ To really get a boost, we will run a random forest. The key insight of random fo
 ```{r}
 # RANDOM FOREST ------------------------- 
 # Now we will limit the number of predictors allowed using mtry
-# Let's set it to sqrt(18) predictors and examine our results. 
+# Let's set it to sqrt(34) predictors and examine our results. 
 
 set.seed(825)
 rf_model <- caret::train(x, y, 
                           method = "rf",
                           trControl = fitControl,
-                          tuneGrid=expand.grid(mtry=sqrt(18)) # The total number of predictors we put into our model
+                          tuneGrid=expand.grid(mtry=sqrt(34)) # The total number of predictors we put into our model
                           )
 rf_model
 
@@ -379,12 +401,12 @@ plot(rocCurve, print.thres = "best") # this is the best threshold, where best me
 
 # But you feel free to adjust the threshold however you want when you're building your mdoel. 
 
-## Now, let's rerun the codes in lines 369 and 370 with this new threshold in mind:  
+## Now, let's rerun the codes in lines 391 and 392 with this new threshold in mind:  
 
 pred_rf = predict(rf_model, newdata = val_data, type = "prob")
-threshold <- 0.163
+threshold <- 0.307
 rfpred      <- factor( ifelse(pred_rf[, "1"] > threshold, "1", "0") )
-rfpred      <- relevel(rfpred, "1")   # you may or may not need this; I did
+# rfpred      <- relevel(rfpred, "1")   # you may or may not need this; I did
 confusionMatrix(rfpred, val_data$HighWelf, positive="1")
 
 #dev.off(); 
@@ -402,7 +424,12 @@ plot(roc(val_data$HighWelf, prob_rf[,2]))
 
 ```
 
-Did the accuracy improve?? Please explain how bagging, boosting and random forests improve prediction. Use the text and your notes to explain.
+Did the accuracy improve? How did it change as you adjusted the threshold (feel free to change the threshold to what ever number makes the most sense to you, like we did in the bagging chunk above.) Please explain how bagging, boosting and random forests improve prediction. Use the text and your notes to explain.
+
+
+
+
+
 
 
 
@@ -429,15 +456,15 @@ Answer above.
 
 # Choose your "best" model and run on the Test data
 
-Choose whichever model you prefer best. The term best here is used loosely, so feel free to determine how to define it and explain your reasons below.  
+Choose whichever model you prefer best. Note that the term "best" here is used loosely, so feel free to determine how to define it and explain your reasons below.  
 
 To illustrate, I will choose the random forest model.  
 
 ```{r model-on-test}
 test_pred_rf = predict(rf_model, newdata = test, type = "prob")
-threshold <- 0.163
+threshold <- 0.26
 test_rfpred      <- factor( ifelse(test_pred_rf[, "1"] > threshold, "1", "0") )
-test_rfpred      <- relevel(test_rfpred, "1")   # you may or may not need this; I did
+#test_rfpred      <- relevel(test_rfpred, "1")   # you may or may not need this; I did
 confusionMatrix(test_rfpred, test$HighWelf, positive="1")
 
 #dev.off(); 
@@ -481,7 +508,9 @@ Report your findings above.
 ```{r}
 bag_ext = randomForest(HighWelf ~ CCSITE + FWSITE + HOSITE + ZAGELT25 + ZHISP +
     ZBLACK + ZACH05 + ZPUBLICH + MNTHEMP + LTRECIP + YR3KEMP + YR3EARNAV +
-    YREMP + pyrearn + YRREC + YRKREC + YRRFS + RAYEAR, data=train_data, mtry=18, ntree=2500) # Adjust this last parameter.
+    YREMP + pyrearn + YRREC + YRKREC + YRRFS + RAYEAR + 
+ KRFS2T17 + FSC2T17 + INCC1417 + GEMP2T17 + KEMP2T17 + EARN1417 + EMPCNT2T17 + E1G1 + YRKRFS + ARESERN
+ + GYRFS + INCC2T17 + E1E4A + ARESERN + PEARN1 +E1I1 + AHIGHGRAD, data=train_data, mtry=34, ntree=2500) # Adjust this last parameter.
 
 pred_ext_bag = predict(bag_ext, newdata = test)
 confusionMatrix(pred_ext_bag, test$HighWelf, positive = "1")
@@ -491,7 +520,7 @@ plot(pred_ext_bag, test$HighWelf)
 ```  
 
 
-(2) Change the number of predictors allowed in the random forest growth. Report on whether it changed the prediction accuracy. First use Mtry=4, then 6. e. Why do you think the accuracy is actually better when you try fewer variables? (think about the concept of decorrelation)
+(2) Change the number of predictors allowed in the random forest growth. Report on whether it changed the prediction accuracy. First use Mtry=4, then 6. Why do you think the accuracy is actually better when you try fewer variables? (think about the concept of decorrelation)
 
 
 
@@ -573,7 +602,7 @@ HighWelf_boost_results <- rep('0', 231)
 HighWelf_boost_results[test$HighWelf =='1'] = '1'
 #HighWelf_boost_results
 pred_boost = rep('0', 231)
-pred_boost[prob_boost$`1` > 0.5] = '1'
+pred_boost[prob_boost$`1` > 0.5] = '1' # > 0.5 is the threshold. feel free to change and report your findings.
 # pred_boost
 
 table(pred_boost, HighWelf_boost_results)
@@ -582,3 +611,5 @@ table(pred_boost, HighWelf_boost_results)
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
 
 When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+
