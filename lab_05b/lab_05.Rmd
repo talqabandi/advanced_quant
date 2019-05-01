@@ -1,8 +1,8 @@
 ---
-title: 'Lab 5: Random Forests Notebook'
+title: 'Lab 5b: Random Forests Notebook'
 author: "Tima Alqabandi"
 date: "April 11, 2019"
-output: github_document
+output: html_document
 ---
 
 ```{r setup, include=FALSE}

@@ -1,8 +1,8 @@
 ---
-title: 'Lab 5: Random Forests Notebook'
+title: 'Lab 5b: Random Forests Notebook'
 author: "Tima Alqabandi"
 date: "April 11, 2019"
-output: github_document
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -148,69 +148,9 @@ test = data.frame(test, HighWelf_value_test)
 
 ## I am writing it here for easy of copying and pasting:
  #  CCSITE + FWSITE +  HOSITE +  racode +  ZAGELT25 + ZHISP +  ZBLACK +  ZACH05 +  ZPUBLICH +  MNTHEMP +LTRECIP +  YR3KEMP +  YR3EARNAV +  YREMP +  pyrearn + YRREC +  YRKREC +  YRRFS + RAYEAR   
-
-
-
-# LOGISTIC MODEL -------------------------
-
-# (1) Create Model using all the features from the last assignment
-
-lgs_regression <- glm(HighWelf ~ CCSITE + FWSITE +  HOSITE +  racode +  ZAGELT25 + 
-                        ZHISP +  ZBLACK +  ZACH05 +  ZPUBLICH +  MNTHEMP + LTRECIP +  
-                        YR3KEMP +  YR3EARNAV +  YREMP +  pyrearn + YRREC +  YRKREC +  
-                        YRRFS + RAYEAR , family=binomial, data=train)
-summary(lgs_regression)
-
-# (2) Run Diagnostics
-
-exp(coef(lgs_regression))
-#logisticPseudoR2s(lgs_regression)
-
-# (3) Insert model probability into our dataset
-
-prob_final = predict(lgs_regression,type="response")
-train$prob_final <- prob_final
-
-quantile(train$prob_final)
-
-# (4) Predict "HighWelf" or "Not" based on model
-
-pred_final = rep(0, 3732) # Creates a vector of 544 "not highwelf" elements. 544 is the number of rows that are present in the dataset. The code below will lable those with probabilities of more than 0.5 as being in HighWelf
-
-pred_final[train$prob_final>0.5] = 1 # Changes the "Not" elements to "yes" in terms of "HighWelf" if probability is above 0.5. This is known as the threshold. Feel free to change this if you'd like!
-
-pred_final[1:40] ## This will show us the predictions for the first 40 rows
-train$pred_final <- pred_final
-
-table(train$pred_final)
-table(pred_final,train$HighWelf) # Confusion table that compares our prediction to the Survived that was reality
-## we see that our model predicted that no one was in HighWelf. That has to do with the 0.5 threshold.
-
-# Accuracy
-table <- table(pred_final,train$HighWelf)
-Accuracy <- sum(diag(table)/sum(table))
-print(paste('Accuracy: ', Accuracy))
-
-# Calculate AUC and plot ROC curve
-prob_log = predict(lgs_regression, type ='response')
-auc(train$HighWelf, prob_log)
-plot(roc(train$HighWelf, prob_log))
-
 ```
-*In this space below (before the next code block), report the accuracy of this model and the area under the curve. These are two different criteria. Explain what they tell you. This will be your baseline that we'll try to improve with the tree models. Also, please describe the coeffecients in the model (what significant and what is the nature of the relationships?)
 
-
-
-
-
-
-
-
-
-
-
-
-Insert Answer in the space above. Then, lets now move on to the next step. 
+## Preparing to build our first tree.  
 
 One of the flaws of "entry level" decision trees, that is, a decision tree based on a whole dataset, is that they tend to "overfit" the data. At an extreme, they can memorize your dataset. So in order to properly evaluate the performance of a classification tree on these data, we must estimate the *test error* rather than simply computing the training error. That is why we created train and test datasets in lab 5a. 
 
@@ -228,61 +168,7 @@ train_data <- train[ trainIndex,] # Creating our training set
 val_data  <- train[-trainIndex,] # creating our testing set
 ```
 
-
-# Running our base model
-
-We are going to run the same logisitic regression as above, but we will test it against our validation data. We want to compare our trees and random forests to this logistic model's performance.  
-
-```{r}
-# LOGISTIC MODEL -------------------------
-
-# (1) Create Model using all the features from the last assignment
-
-lgs_regression2 <- glm(HighWelf ~ CCSITE + FWSITE +  HOSITE +  racode +  ZAGELT25 + 
-                        ZHISP +  ZBLACK +  ZACH05 +  ZPUBLICH +  MNTHEMP + LTRECIP +  
-                        YR3KEMP +  YR3EARNAV +  YREMP +  pyrearn + YRREC +  YRKREC +  
-                        YRRFS + RAYEAR , family=binomial, data=train_data)
-summary(lgs_regression2)
-
-# (2) Run Diagnostics
-
-exp(coef(lgs_regression2))
-#logisticPseudoR2s(lgs_regression)
-
-# (3) Insert model probability into our dataset
-
-prob_final = predict(lgs_regression2, val_data, type="response")
-val_data$prob_final <- prob_final
-
-quantile(val_data$prob_final)
-
-# (4) Predict "HighWelf" or "Not" based on model
-
-pred_final = rep(0, 745) # Creates a vector of 108 "not highwelf" elements. 108 is the number of rows that are present in the dataset. The code below will lable those with probabilities of more than 0.5 as being in HighWelf
-
-pred_final[val_data$prob_final>0.5] = 1 # Changes the "Not" elements to "yes" in terms of "HighWelf" if probability is above 0.5. This is known as the threshold. Feel free to change this if you'd like!
-
-pred_final[1:40] ## This will show us the predictions for the first 40 rows
-val_data$pred_final <- pred_final
-
-table(val_data$pred_final)
-table(pred_final,val_data$HighWelf) # Confusion table that compares our prediction to the Survived that was reality
-## we see that our model predicted that no one was in HighWelf. That has to do with the 0.5 threshold.
-
-# Accuracy
-table <- table(pred_final,val_data$HighWelf)
-Accuracy <- sum(diag(table)/sum(table))
-print(paste('Accuracy: ', Accuracy))
-
-# Calculate AUC and plot ROC curve
-prob_log = predict(lgs_regression2, val_data, type ='response')
-auc(val_data$HighWelf, prob_log)
-plot(roc(val_data$HighWelf, prob_log))
-
-```
-
-
-# Building our first tree.  
+### Building our first tree.  
 
 ```{r}
 
@@ -306,6 +192,10 @@ fancyRpartPlot(tree_train)
 train_pred = predict(tree_train, val_data, type="class")
 confusionMatrix(train_pred, val_data$HighWelf, positive="1")
 
+# Plotting ROC curve
+prob_tree = predict(tree_train, newdata = val_data, type ='prob')
+auc(val_data$HighWelf, prob_tree[,2])
+plot(roc(val_data$HighWelf, prob_tree[,2]))
 ```
 
 ##### Using the lecture notes and the text, please explain what just happened. How does the tree work? How is it deciding which variables to split on and where to split. Please explain what is happening statistically. What is the significance (if any) of "YRRFS" being the first split variable? For two of the leaves, describe the pathway of who ended up in the leaf. Open the output above in the "R console" view. Try to figure out how to interpret it. Which terminal node had the highest HighWelf rate? Does it make sense based on what you know about the data? Which terminal node had the lowest HighWelf rate? 
@@ -339,10 +229,7 @@ Answer above
 
 # Pruning the tree  
 
-Notice the tree that was produced above. There are many branches and leaves. This is what we'd call a "bushy" tree. It is likely still overfitting the data. Let us therefore "prune" the tree to get a more reliable results. 
-
-Although you may think more nodes is better, that often means overfitting, leading to poor test performance.
-A smaller tree with fewer splits could lead to better test results. This is achieved by pruning the tree.
+The tree produced above is likely overfitting the data. If that is the case, then we can "prune" the tree to get a more reliable results. 
 
 To prune this tree, we will use the function printcp() and will look at the `xerror` column specifically.  We want the smallest xerror value (which stands for cross-validated error.)
 
@@ -358,7 +245,7 @@ plotcp(tree_train)
 tree_train$cptable[which.min(tree_train$cptable[,"xerror"]),"CP"]
 ```
 
-It just so happens, with our dataset and our dependent variable, that the smallest xerror happens to involve 0.0508 splits, which is closer to "no pruning."   
+It just so happens, with our dataset and our dependent variable, that the smallest xerror happens to involve 3 splits, which is closer to "no pruning," since our model is already had three splits.     
 
 With that said, however, for learning purposes, I will show you what you would do to prune the tree using the smallest xerror. Running this may not work, so don't worry if you get an error when you run the plot() function.  
 
@@ -366,7 +253,8 @@ With that said, however, for learning purposes, I will show you what you would d
 prune_tree_train <- prune(tree_train, 
                       cp=tree_train$cptable[which.min(tree_train$cptable[,"xerror"]),"CP"])
 
-plot(prune_tree_train, main="Pruned Classification Tree")
+fancyRpartPlot(prune_tree_train, main="Pruned Classification Tree")
+
 ```  
 
 
@@ -414,13 +302,7 @@ Next, we need to define our X and our Y.
 
 Defining X:
 ```{r defining-x}
-predictors = c("CCSITE", "FWSITE", "HOSITE", "racode", "ZAGELT25",
-
-               "ZHISP", "ZBLACK", "ZACH05", "ZPUBLICH", "MNTHEMP",
-
-               "LTRECIP", "YR3KEMP", "YR3EARNAV", "YREMP", "pyrearn",
-
-          "YRREC", "YRKREC", "YRRFS", "RAYEAR") 
+predictors = c("CCSITE", "FWSITE", "HOSITE", "racode", "ZAGELT25", "ZHISP", "ZBLACK", "ZACH05", "ZPUBLICH", "MNTHEMP", "LTRECIP", "YR3KEMP", "YR3EARNAV", "YREMP", "pyrearn", "YRREC", "YRKREC", "YRRFS", "RAYEAR") 
 x <- train_data[, (names(train_data) %in% predictors)]
 y = train_data$HighWelf
 ```
@@ -451,7 +333,7 @@ plot(rocCurve, print.thres = "best") # this is the best threshold, where best me
 ## Now, let's rerun the codes in lines 443 and 444 with this new threshold in mind:  
 
 pred_bag = predict(bag_model, newdata = val_data, type = "prob")
-threshold <- 0.253 # we got this number from the plot.
+threshold <- 0.269 # we got this number from the plot.
 bagpred      <- factor( ifelse(pred_bag[, "1"] > threshold, "1", "0") )
 bagpred      <- relevel(bagpred, "1")   # you may or may not need this; I did
 confusionMatrix(bagpred, val_data$HighWelf, positive="1")
